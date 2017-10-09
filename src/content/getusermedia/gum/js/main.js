@@ -26,6 +26,30 @@ function handleSuccess(stream) {
   };
   window.stream = stream; // make variable available to browser console
   video.srcObject = stream;
+
+  var detector = new FaceDetector();
+  detector.detect(video)
+      .then(detectedFaces => {
+        for (var i = 0; i < detectedFaces.length; i++) {
+          var boundingBox = detectedFaces[i].boundingBox;
+          var result = boundingBox.x + "," + boundingBox.y + "," +
+                       boundingBox.width + "," + boundingBox.height;
+          results += result + "#";
+
+          context.beginPath();
+          context.rect(detectedFaces[i].boundingBox.x, detectedFaces[i].boundingBox.y, detectedFaces[i].boundingBox.width, detectedFaces[i].boundingBox.height);
+          // for (i = 0; i < detectedObjects[0].cornerPoints.length; i ++) {
+          //   context.arc(detectedObjects[0].cornerPoints[i].x, detectedObjects[0].cornerPoints[i].y, 5, 0, 2 * Math.PI, false);
+          // }
+          // context.lineWidth = 2;
+          context.strokeStyle = 'yellow';
+          context.stroke();
+        }
+        console.log("=====the detected faces is " + detectedFaces.length + " boundingBox is " + results);
+      })
+      .catch(error => {
+        document.title = 'Error during detection: ' + error.message;
+      });
 }
 
 function handleError(error) {
